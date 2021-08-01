@@ -42,13 +42,14 @@ A / AAAA / PTR records for mail.primary.tld have to be in place.
 
 ### Installed Packages:
 
-    dovecot-2.3.14p0v0
-    dovecot-fts-xapian-1.4.8
-    dovecot-pigeonhole-0.5.14v1
+    dovecot-2.3.15v0
+    dovecot-fts-xapian-1.4.8p0
+    dovecot-pigeonhole-0.5.15v1
     opensmtpd-extras-6.7.1v0
     opensmtpd-filter-dkimsign-0.4
     opensmtpd-filter-rspamd-0.1.7p0
     opensmtpd-filter-senderscore-0.1.1p0
+    rspamd-2.7p0
 
 
 ### Virtual Mail User
@@ -191,6 +192,10 @@ This is a hack. Use ```makemap -t set /etc/mail/virtual_rejects``` to generate t
     filter filter_dkimsign \
         proc-exec "filter-dkimsign -t -d primary.tld -s default -k /etc/mail/dkim/primary.tld.key" user _dkimsign group _dkimsign
 
+    filter filter_rspamd \
+        proc-exec "filter-rspamd"
+
+
 
     table aliases file:/etc/mail/aliases
     table credentials sqlite:/etc/mail/sqlite.conf
@@ -200,7 +205,7 @@ This is a hack. Use ```makemap -t set /etc/mail/virtual_rejects``` to generate t
 
 
     listen on all tls-require tag MTA pki mail.primary.tld \
-        filter { filter_check_dyndns, filter_check_rdns, filter_check_fcrdns, filter_senderscore }
+        filter { filter_check_dyndns, filter_check_rdns, filter_check_fcrdns, filter_senderscore, filter_rspamd }
 
     listen on all port submission tls-require tag MSA pki mail.primary.tld auth <credentials> \
         filter { filter_dkimsign }
@@ -233,7 +238,7 @@ This is a hack. Use ```makemap -t set /etc/mail/virtual_rejects``` to generate t
 
 /etc/dovecot/local.conf
 
-Messy. Sieve config omitted. 
+Messy. Sieve config omitted. See [Gilles' article](https://poolp.org/posts/2019-09-14/setting-up-a-mail-server-with-opensmtpd-dovecot-and-rspamd/).
 
 TLS / AUTH stuff:
 
